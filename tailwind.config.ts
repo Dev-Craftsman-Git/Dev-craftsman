@@ -16,10 +16,8 @@ const config: Config = {
                 background: "var(--background)",
                 card: "var(--card-bg)",
                 border: "var(--border-color)",
-            },
-            textColor: {
-                primary: "var(--text-primary)",
-                secondary: "var(--text-secondary)",
+                "text-primary": "var(--text-primary)",
+                "text-secondary": "var(--text-secondary)",
             },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

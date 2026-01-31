@@ -1,0 +1,292 @@
+
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+const projects = [
+    {
+        id: "1", // Using string IDs for DB consistency, or let CUID handle it. But to match existing layout, let's let DB generate CUIDs or map them. 
+        // Actually, prisma schema uses CUID string. I should let it generate IDs or map old numeric IDs to something new.
+        // Let's create new entries. The old numeric IDs were just for static array.
+        title: "SaaS Analytics Dashboard",
+        slug: "saas-analytics-dashboard",
+        industry: "Web",
+        description: "High-performance analytics dashboard for enterprise data visualization with real-time updates.",
+        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+        tech: JSON.stringify(["React", "D3.js", "Node.js"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Live",
+        content: "A comprehensive dashboard solution designed for large-scale enterprise data visualization. Features include real-time websocket updates, custom D3.js charts, and role-based access control.",
+        challenges: "Handling massive datasets without compromising UI performance was the primary challenge. We needed to render thousands of data points in real-time.",
+        solutions: "We implemented windowing techniques and Web Workers to offload data processing from the main thread, ensuring a smooth 60fps experience even under heavy load.",
+        showDemo: false
+    },
+    {
+        title: "Modern E-Commerce Platform",
+        slug: "modern-e-commerce-platform",
+        industry: "Web",
+        description: "Full-featured online store with cart, checkout, and inventory management.",
+        image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=800&q=80",
+        tech: JSON.stringify(["Next.js", "Stripe", "PostgreSQL"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Live",
+        content: "A scalable e-commerce platform built for high volume traffic. Includes a custom CMS for product management, integrated Stripe payments, and real-time inventory tracking.",
+        challenges: "Ensuring data consistency during high-traffic flash sales and managing complex inventory states.",
+        solutions: "Utilized database transactions and optimistic locking to prevent overselling. Implemented a Redis-based queuing system for order processing.",
+        showDemo: false
+    },
+    {
+        title: "Cloud File Manager",
+        slug: "cloud-file-manager",
+        industry: "Web",
+        description: "Secure cloud storage solution with file sharing and collaboration features.",
+        image: "https://images.unsplash.com/photo-1544197150-b99a580bbcbf?w=800&q=80",
+        tech: JSON.stringify(["Vue.js", "AWS S3", "Firebase"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Internal Beta",
+        content: "A Dropbox-like file management interface allowing drag-and-drop uploads, folder organization, and link sharing with access controls.",
+        challenges: "Implementing resilient large file uploads and resume capability over unstable connections.",
+        solutions: "Used chunked multipart uploads direct to S3, with a client-side library to handle retry logic and progress tracking.",
+        showDemo: false
+    },
+    {
+        title: "E-Commerce Superapp",
+        slug: "e-commerce-superapp",
+        industry: "Mobile",
+        description: "Flutter-based multi-vendor marketplace with real-time tracking and payments.",
+        image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80",
+        tech: JSON.stringify(["Flutter", "Firebase", "Stripe"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Live",
+        content: "A unified mobile experience for browsing multiple vendors, tracking orders in real-time, and managing digital wallets.",
+        challenges: "Providing a consistent 60fps experience across both iOS and Android with complex animations.",
+        solutions: "Optimized complex widget trees and used native platform channels only where necessary for performance critical tasks.",
+        showDemo: false
+    },
+    {
+        title: "Fitness Tracker Pro",
+        slug: "fitness-tracker-pro",
+        industry: "Mobile",
+        description: "Activity tracking application with workout plans and health metrics integration.",
+        image: "https://images.unsplash.com/photo-1576678927484-cc907957088c?w=800&q=80",
+        tech: JSON.stringify(["React Native", "HealthKit", "GraphQL"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Live",
+        content: "Integrates with Apple Health and Google Fit to aggregate daily activity data. Offers personalized workout plans generated by localized algorithms.",
+        challenges: "Syncing background data reliably without draining battery life.",
+        solutions: "Implemented efficient background fetch tasks and local batching of data points before syncing to the server.",
+        showDemo: false
+    },
+    {
+        title: "AR Interior Designer",
+        slug: "ar-interior-designer",
+        industry: "Mobile",
+        description: "Augmented reality app for visualizing furniture and decor in your home.",
+        image: "https://images.unsplash.com/photo-1555421689-d68471e189f2?w=800&q=80",
+        tech: JSON.stringify(["Swift", "ARKit", "Unity"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Prototype",
+        content: "Allows users to place 3D models of furniture in their room through the camera view. Features real-time lighting estimation and occlusion.",
+        challenges: "Achieving realistic object sizing and stability in varying light conditions.",
+        solutions: "Leveraged LiDAR data on supported devices and advanced plane detection algorithms for accurate placement.",
+        showDemo: false
+    },
+    {
+        title: "AI Legal Assistant",
+        slug: "ai-legal-assistant",
+        industry: "AI/ML",
+        description: "RAG-based legal analysis bot using GPT-4 and Vector DB. Analyzes contracts in seconds.",
+        image: "https://images.unsplash.com/photo-1589216532384-950332945912?w=800&q=80",
+        tech: JSON.stringify(["Next.js", "LangChain", "Pinecone"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Beta",
+        content: "An intelligent assistant that ingests PDF contracts, indexes them for semantic search, and answers questions about liability and clauses.",
+        challenges: "Minimizing hallucinations and ensuring the bot cites specific clauses for its answers.",
+        solutions: "Implemented a strict Retrieval-Augmented Generation (RAG) pipeline where the model is constrained to answer only using retrieved context chunks.",
+        showDemo: false
+    },
+    {
+        title: "Medical Diagnosis System",
+        slug: "medical-diagnosis-system",
+        industry: "AI/ML",
+        description: "Deep learning model for early detection of abnormalities in medical imaging.",
+        image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
+        tech: JSON.stringify(["Python", "PyTorch", "FastAPI"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Research",
+        content: "A CNN-based model trained on thousands of X-ray images to identify potential signs of pneumonia and other conditions.",
+        challenges: "Handling class imbalance in the training dataset and ensuring explainability.",
+        solutions: "Used data augmentation and Grad-CAM visualization to highlight specific regions the model focused on for diagnosis.",
+        showDemo: false
+    },
+    {
+        title: "Predictive Maintenance",
+        slug: "predictive-maintenance",
+        industry: "AI/ML",
+        description: "IoT data analysis engine to predict equipment failures before they happen.",
+        image: "https://images.unsplash.com/photo-1581092921461-eab62e97a782?w=800&q=80",
+        tech: JSON.stringify(["TensorFlow", "Keras", "MQTT"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Live",
+        content: "Analyzes vibration and temperature sensor data streams to detect anomalies indicating wear and tear.",
+        challenges: "Processing high-frequency sensor streams in real-time.",
+        solutions: "Deployed edge AI models to pre-process data locally, sending only aggregated insights and alerts to the cloud.",
+        showDemo: false
+    },
+    {
+        title: "Smart Campus IoT",
+        slug: "smart-campus-iot",
+        industry: "IoT",
+        description: "LoRaWAN network for university campus monitoring (energy, occupancy, air quality).",
+        image: "https://images.unsplash.com/photo-1558346490-a7d938dc41e9?w=800&q=80",
+        tech: JSON.stringify(["ESP32", "AWS IoT", "InfluxDB"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Live",
+        content: "A wide-area network of low-power sensors monitoring classroom occupancy, humidity, and energy usage across 20 buildings.",
+        challenges: "Ensuring reliable connectivity in basements and thick-walled buildings.",
+        solutions: "Established a LoRaWAN mesh network to extend range and penetration effectively.",
+        showDemo: false
+    },
+    {
+        title: "Industrial Sensor Grid",
+        slug: "industrial-sensor-grid",
+        industry: "IoT",
+        description: "Real-time monitoring system for factory floor environmental conditions.",
+        image: "https://images.unsplash.com/photo-1563770095128-422204c35c82?w=800&q=80",
+        tech: JSON.stringify(["Zigbee", "Raspberry Pi", "Azure"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Pilot",
+        content: "Monitors temperature, humidity, and particulate matter on the factory floor to ensure compliance with safety standards.",
+        challenges: "Integrating disparate legacy sensors into a unified modern dashboard.",
+        solutions: "Developed custom hardware bridges using Raspberry Pis to read legacy protocols and translate data to MQTT/JSON.",
+        showDemo: false
+    },
+    {
+        title: "Smart Home Hub",
+        slug: "smart-home-hub",
+        industry: "IoT",
+        description: "Centralized control hub for smart home devices with automation rules.",
+        image: "https://images.unsplash.com/photo-1558002038-1091a166111c?w=800&q=80",
+        tech: JSON.stringify(["Home Assistant", "Zigbee", "Node.js"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Live",
+        content: "A local-first hub that unifies devices from Philips Hue, Tuya, and Sonos into a single control interface.",
+        challenges: "Reducing latency for light switches and ensuring privacy (no cloud dependency).",
+        solutions: "Built entirely on local network protocols with all automation logic executing on the hub device.",
+        showDemo: false
+    },
+    {
+        title: "Crypto Exchange DEX",
+        slug: "crypto-exchange-dex",
+        industry: "Blockchain",
+        description: "Decentralized exchange with automated market maker and liquidity pools.",
+        image: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=800&q=80",
+        tech: JSON.stringify(["Solidity", "React", "Hardhat"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Live",
+        content: "An AMM-based exchange allowing permissionless swapping of ERC-20 tokens.",
+        challenges: "Optimizing gas costs for users and preventing front-running attacks.",
+        solutions: "Optimized smart contracts for gas efficiency and integrated slippage protection mechanisms.",
+        showDemo: false
+    },
+    {
+        title: "Supply Chain Tracker",
+        slug: "supply-chain-tracker",
+        industry: "Blockchain",
+        description: "Transparent supply chain management using Ethereum smart contracts.",
+        image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80",
+        tech: JSON.stringify(["Solidity", "Web3.js", "Next.js"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Pilot",
+        content: "Records every step of product movement on an immutable ledger, from raw material to end consumer.",
+        challenges: "Scalability and data privacy for sensitive supplier info.",
+        solutions: " utilized a hybrid approach storing hashes on-chain and encrypted detailed data on IPFS.",
+        showDemo: false
+    },
+    {
+        title: "NFT Marketplace",
+        slug: "nft-marketplace",
+        industry: "Blockchain",
+        description: "Platform for creating, buying and selling unique digital assets.",
+        image: "https://images.unsplash.com/photo-1620321023374-d1a68fbc720d?w=800&q=80",
+        tech: JSON.stringify(["IPFS", "Ethereum", "React"]),
+        demoUrl: "#",
+        repoUrl: "#",
+        client: "Internal Project",
+        status: "Live",
+        content: "A community-focused marketplace for digital artists to mint and auction their work.",
+        challenges: "Simplifying the onboarding process for non-crypto native users.",
+        solutions: "Integrated social login and fiat on-ramps to abstract away wallet complexity.",
+        showDemo: false
+    }
+];
+
+async function main() {
+    console.log('Seeding projects...');
+
+    // Clear existing projects to avoid duplicates if re-running
+    await prisma.project.deleteMany({});
+
+    for (const project of projects) {
+        await prisma.project.create({
+            data: {
+                title: project.title,
+                slug: project.slug,
+                description: project.description,
+                content: project.content,
+                industry: project.industry,
+                tags: project.tech,
+                thumbnail: project.image,
+                websiteUrl: project.demoUrl,
+                repoUrl: project.repoUrl,
+                client: project.client,
+                status: project.status,
+
+                images: '[]',
+                isFeatured: false,
+                order: 0,
+                publishedAt: new Date(),
+
+            }
+        });
+    }
+
+    console.log('Seed completed successfully!');
+}
+
+main()
+    .catch((e) => {
+        console.error(e);
+        process.exit(1);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    });

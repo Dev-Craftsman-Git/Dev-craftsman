@@ -12,6 +12,7 @@
   --color-secondary: var(--secondary);
   --color-card: var(--card-bg);
   --color-border: var(--border-color);
+  --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);

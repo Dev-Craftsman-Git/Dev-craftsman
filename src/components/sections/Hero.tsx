@@ -28,10 +28,9 @@ export default function Hero() {
                         fontSize: 'clamp(2.5rem, 8vw, 8rem)',
                         lineHeight: 1.1,
                         textShadow: `0 0 20px ${theme.colors.primary}`,
-                        WebkitTextStroke: '2px rgba(255,255,255,0.1)'
                     }}>
                     Unleash Your <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-text-primary to-text-secondary">
+                    <span className="text-text-primary">
                         Project Superpowers
                     </span>
                 </h1>

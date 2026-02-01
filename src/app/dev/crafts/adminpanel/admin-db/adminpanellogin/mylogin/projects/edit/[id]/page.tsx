@@ -15,6 +15,7 @@ export default function EditProjectPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [loadError, setLoadError] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [formData, setFormData] = useState({
         title: '',
@@ -53,6 +54,7 @@ export default function EditProjectPage() {
             });
         } catch (error) {
             console.error('Failed to fetch project', error);
+            setLoadError(true);
             alert('Failed to load project data');
         } finally {
             setIsLoading(false);
@@ -106,7 +108,7 @@ export default function EditProjectPage() {
     };
 
     if (isLoading) return <div className="p-8">Loading...</div>;
-    if (!project && !isLoading) return <div className="p-8">Project not found</div>;
+    if (loadError) return <div className="p-8">Project not found</div>;
 
     return (
         <div className="max-w-4xl mx-auto">

@@ -35,17 +35,45 @@ export default function EditProjectPage() {
         }
     }, [params.id]);
 
+    const safeParseTags = (tagsRaw: string | any): string => {
+        if (!tagsRaw) return '';
+        try {
+            // If it's already an array (unlikely from DB but possible in some states)
+            if (Array.isArray(tagsRaw)) return tagsRaw.join(', ');
+
+            // If it's a string, try to parse it
+            if (typeof tagsRaw === 'string') {
+                // Check if it looks like a JSON array
+                if (tagsRaw.trim().startsWith('[')) {
+                    const parsed = JSON.parse(tagsRaw);
+                    return Array.isArray(parsed) ? parsed.join(', ') : String(parsed);
+                }
+                // If it's just a plain string, return it
+                return tagsRaw;
+            }
+            return String(tagsRaw);
+        } catch (e) {
+            console.warn('Failed to parse tags:', tagsRaw);
+            return String(tagsRaw); // Fallback to raw string
+        }
+    };
+
     const fetchProject = async (id: string) => {
         try {
             const res = await axios.get(`/api/projects/${id}`);
             const data = res.data;
+
+            if (!data) {
+                throw new Error('No data received');
+            }
+
             setFormData({
-                title: data.title,
-                slug: data.slug,
+                title: data.title || '',
+                slug: data.slug || '',
                 category: data.industry || 'Web',
                 description: data.description || '',
                 content: data.content || '',
-                tech: JSON.parse(data.tags || '[]').join(', '),
+                tech: safeParseTags(data.tags),
                 image: data.thumbnail || '',
                 link: data.websiteUrl || '',
                 demoUrl: data.demoUrl || '',
@@ -53,7 +81,7 @@ export default function EditProjectPage() {
             });
         } catch (error) {
             console.error('Failed to fetch project', error);
-            alert('Failed to load project data');
+            alert('Failed to load project data. Please check console for details.');
         } finally {
             setIsLoading(false);
         }
